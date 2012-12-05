@@ -35,10 +35,10 @@ char * str_ethernet_addr(const u_int8_t * addr) {
   for(i = 0; i < 32; i++) {
     saddr[i] = '\0';
   }
-  for(i = ETH_ALEN -1 ; i >= 0; i--) {
+  for(i = 0 ; i < ETH_ALEN; i++) {
     sprintf(hexbuffer, "%02X", addr[i]);
     strncat(saddr, hexbuffer, 2);
-    if(i != 0)
+    if(i != ETH_ALEN-1)
       strncat(saddr, ":", 1);
   }
   return saddr;
@@ -54,21 +54,21 @@ void decode_ethernet(const u_char * packet) {
   str_shost = str_ethernet_addr(ethernet->ether_shost);
   str_dhost = str_ethernet_addr(ethernet->ether_dhost);
 
-  V("Ethernet - %s --> %s - Type : ", str_shost, str_dhost);
+  V(0, "Ethernet - %s --> %s - Type : ", str_shost, str_dhost);
 
   switch(ethernet->ether_type) {
     case 0x0008 :
-      V("IP\n");
+      V(0, "IP\n");
       decode_ip(packet + sizeof(struct ether_header));
       break;
     case 0x0608 :
-      V("ARP\n");
+      V(0, "ARP\n");
       break;
     case 0x3508 :
-      V("RARP\n");
+      V(0, "RARP\n");
       break;
     default :
-      V("Unknown\n");
+      V(0, "Unknown\n");
       break;
   }
 

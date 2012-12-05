@@ -26,12 +26,16 @@
 #include "scanner.h"
 #include "ethernet.h"
 
-#define PROMISC_MODE 1
+#define PROMISC_MODE 0
 #define TIMEOUT_MS 500
 #define SNAPLEN 1500
 #define NB_PACKETS_TO_CAPTURE -1
 
 extern int verbosity_level;
+
+void start_file_scanner(char * file) {
+	
+}
 
 void start_scanner(char * interface) {
   unsigned int net_ip, netmask;
@@ -43,7 +47,6 @@ void start_scanner(char * interface) {
 
   /* pcap_t * */ 
 
-  VVV(0, "Getting information from interface : %s\n", interface);
   if((pcap_lookupnet (interface, &net_ip, &netmask, errbuf)) == -1) {
     fprintf(stderr, "Failed to get information about %s : %s\n", interface, errbuf);
     exit(-1);
@@ -58,9 +61,8 @@ void start_scanner(char * interface) {
   str_netmask = inet_ntoa(addr);
   str_netmask = strndup(str_netmask, strlen(str_netmask));
 
-  V(0, "%s - %s (%s)\n", interface, str_net_ip , str_netmask);
+  VVV(0, "%s - %s (%s)\n", interface, str_net_ip , str_netmask);
 
-  VVV(0, "Initializating pcap with interface : %s\n", interface);
   if((pcap_inst = pcap_open_live(interface, SNAPLEN, PROMISC_MODE, TIMEOUT_MS, errbuf)) == NULL) {
     fprintf(stderr, "Failed to open %s in promiscuous mode\n", interface);
     exit(-1);
@@ -68,7 +70,6 @@ void start_scanner(char * interface) {
 
   pcap_loop(pcap_inst, NB_PACKETS_TO_CAPTURE, scan_packet, NULL);
 
-  VVV(0, "Closing capture on %s\n", interface);
   pcap_close(pcap_inst);
   free(str_net_ip);
   free(str_netmask);
@@ -79,7 +80,7 @@ void scan_packet(
     const struct pcap_pkthdr * header, 
     const u_char * packet) {
 
-  V(0, "%d/%d bytes captured\n", header->caplen, header->len);
+  VVV(0, "%d/%d bytes captured\n", header->caplen, header->len);
   
   decode_ethernet(packet);
 }

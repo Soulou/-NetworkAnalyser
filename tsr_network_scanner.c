@@ -69,9 +69,11 @@ int main(int argc, char * argv[])
     usage(argv[0]);
   }
 
-  VV("Network interface chosen : %s\n", ivalue);
-
-  start_scanner(ivalue);
+	if(fvalue) {
+		start_file_scanner(fvalue);
+	} else {
+	  start_scanner(ivalue);
+	}
 
 	return 0;
 }

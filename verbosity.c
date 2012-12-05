@@ -21,11 +21,13 @@
 
 extern int verbosity_level;
 
-void _V(int _tabs, ...) {
+void _V(int _tabs, char * format, ...) {
   va_list argp;
+	va_start(argp, 0);
   int __i;
   for(__i = 0; __i < _tabs; __i++) 
-    printf("\t"); 
-  vprintf(argp); 
+    printf("  "); 
+  vprintf(format, argp); 
+	va_end(argp);
 }
 

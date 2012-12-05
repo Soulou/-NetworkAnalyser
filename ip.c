@@ -19,6 +19,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #include <netinet/ip.h>
 
 #include "ip.h"
@@ -30,13 +32,30 @@ void decode_ip(const u_char * packet) {
   char * str_sip;
   char * str_dip;
 
-  const struct ip *ip_header;
-  ip_header = (struct ip *)(packet);
+  const struct ip *ip_t;
+	/* const struct iphdr * ip_hdr; */
+  ip_t = (struct ip *)(packet);
+	/* ip_hdr = (struct iphdr *)(packet); */
 
-  str_sip = inet_ntoa(ip_header);
+  str_sip = inet_ntoa(ip_t->ip_src);
   str_sip = strndup(str_sip, strlen(str_sip));
 
-  str_dip = inet_ntoa(ip_header);
+  str_dip = inet_ntoa(ip_t->ip_dst);
   str_dip = strndup(str_dip, strlen(str_dip));
+
+	if(ip_t->ip_v == 0x04) {
+		V(1, "IPv4 - %s --> %s\n", str_sip, str_dip);
+		if(verbosity_level >= 2) {
+			VV(1, "Header length : %d - Length : %d\n",
+					ip_t->ip_hl, ip_t->ip_len);
+			VVV(1,"ID : %d - Fragment Offset : %d - TTL : %d\n",
+					ip_t->ip_id, ip_t->ip_off, ip_t->ip_ttl);
+		}
+	} else {
+		V(1,"IPv6 ?????");
+	}
+
+	free(str_dip);
+	free(str_sip);
 }
 

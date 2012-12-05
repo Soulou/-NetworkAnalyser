@@ -21,6 +21,7 @@
 #include <pcap.h>
 
 void start_scanner(char * interface);
+void start_file_scanner(char * file);
 void scan_packet(
     u_char * args, 
     const struct pcap_pkthdr * header, 

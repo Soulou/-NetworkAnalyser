@@ -18,21 +18,25 @@
 #ifndef _DEBUG_H
 #define _DEBUG_H
 
-void _V(_tabs, ...);
+void _V(int _tabs, ...);
 
-#define V(_tabs, ...)V; \
+// http://gcc.gnu.org/onlinedocs/cpp/Variadic-Macros.html
+// ##__VA_ARGS__ removes the coma if there is no argument
+
+#define V(indent, format, ...); \
   if(verbosity_level >= 1) { \
-    _V(1, __VA_ARGS__); \
+    _V(indent, format, ##__VA_ARGS__); \
   } 
 
-#define VV(_tabs, ...); \
+#define VV(indent, format, ...); \
   if(verbosity_level >= 2) { \
-    _V(2,__VA_ARGS__); \
+    _V(indent ,format, ##__VA_ARGS__); \
   } 
 
-#define VVV(_tabs, ...); \
+
+#define VVV(indent, format, ...); \
   if(verbosity_level == 3) { \
-    _V(3,__VA_ARGS__); \
+    _V(indent ,format, ##__VA_ARGS__); \
   } 
 
 #endif
