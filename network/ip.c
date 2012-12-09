@@ -29,12 +29,12 @@
 #include <transport/udp.h>
 
 #include <verbosity.h>
+#include <output.h>
 
 extern int verbosity_level;
 
 void decode_ip(const u_char * packet) {
-  char * str_sip;
-  char * str_dip;
+  char * str_sip, * str_dip, * b_str_dip, * b_str_sip;
 
   const struct ip *ip_t;
   ip_t = (struct ip *)(packet);
@@ -44,8 +44,10 @@ void decode_ip(const u_char * packet) {
 
   str_dip = inet_ntoa(ip_t->ip_dst);
   str_dip = strndup(str_dip, strlen(str_dip));
+	b_str_dip = bold(str_dip);
+	b_str_sip = bold(str_sip);
 
-	V(1, "IPv4 - %s --> %s\n", str_sip, str_dip);
+	V(1, "IPv4 - %s --> %s\n", b_str_sip, b_str_dip);
 	VV(1, "Header length : %d - Length : %d\n",
 			ip_t->ip_hl, ip_t->ip_len);
 	VVV(1,"ID : %d - Fragment Offset : %d - TTL : %d\n",
@@ -69,5 +71,7 @@ void decode_ip(const u_char * packet) {
 
 	free(str_dip);
 	free(str_sip);
+	free(b_str_dip);
+	free(b_str_sip);
 }
 

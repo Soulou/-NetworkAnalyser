@@ -25,7 +25,9 @@
 #include <network/ip.h>
 #include <network/ip6.h>
 #include <data_link/ethernet.h>
+
 #include <verbosity.h>
+#include <output.h>
 
 extern int verbosity_level;
 
@@ -49,14 +51,18 @@ char * str_ethernet_addr(const u_int8_t * addr) {
 void decode_ethernet(const u_char * packet) {
   char * str_shost = NULL;
   char * str_dhost = NULL;
+	char * b_str_shost = NULL;
+	char * b_str_dhost = NULL;
 
   const struct ether_header *ethernet;
   ethernet = (struct ether_header*)(packet);
   
   str_shost = str_ethernet_addr(ethernet->ether_shost);
   str_dhost = str_ethernet_addr(ethernet->ether_dhost);
+	b_str_shost = bold(str_shost);
+	b_str_dhost = bold(str_dhost);
 
-  V(0, "Ethernet - %s --> %s - Type : ", str_shost, str_dhost);
+  V(0, "Ethernet - %s --> %s - Type : ", b_str_shost, b_str_dhost);
 
 	u_int16_t etype = htons(ethernet->ether_type);
 	if(etype < 0x05dc) {
