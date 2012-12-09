@@ -21,16 +21,24 @@
 #include <arpa/inet.h>
 #include <netinet/udp.h>
 
+#include <application/dhcp.h>
+
 #include <verbosity.h>
 
 extern int verbosity_level;
 
 void decode_udp(const u_char * packet) {
-	
   const struct udphdr *udp_t;
   udp_t = (struct udphdr *)(packet);
 
-	V(2, "UDP - Port %d --> %d\n", htons(udp_t->source), htons(udp_t->dest));
+	u_int16_t source = htons(udp_t->source);
+	u_int16_t dest = htons(udp_t->dest);
+
+	V(2, "UDP - Port %d --> %d\n", source, dest);
 	VV(2, "Length : %d\n", udp_t->len);
-	VVV(2,"Checksum : %d\n", udp_t->check);
+	VVV(2,"Checksum : %x\n", udp_t->check);
+
+	if(source == 0x43 || dest == 0x43) {
+		decode_dhcp(packet + sizeof(struct udphdr));
+	}
 }
