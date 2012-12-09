@@ -53,11 +53,15 @@ void decode_tcp(const u_char * packet) {
   tcp_t = (struct tcphdr *)(packet);
 
 	char * str_flags = build_str_flags(tcp_t);
+	char * wor_str_flags = white_on_red(str_flags);
 
-	V(2, "TCP - Port %d --> %d \e[1m%s\e[0m\n",
-		 	htons(tcp_t->source), htons(tcp_t->dest), str_flags);
-	/* VV(2, "Length : %d\n", udp_t->len); */
-	/* VVV(2,"Checksum : %d\n", udp_t->check); */
+	V(2, "TCP - Port %d --> %d %s\n",
+		 	htons(tcp_t->source), htons(tcp_t->dest), wor_str_flags);
+	VV(2, "Data Offset : %d - SEQ : %x - ACK_SEQ : %x\n", tcp_t->doff, tcp_t->seq, tcp_t->ack_seq);
+	VVV(2,"Reserved : %x - Window Size : %d - Checksum : %x\n", tcp_t->res1, tcp_t->window, tcp_t->check);
+
+
 
 	free(str_flags);
+	free(wor_str_flags);
 }
