@@ -23,6 +23,10 @@
 #include <netinet/ip6.h>
 
 #include <network/ip6.h>
+
+#include <transport/tcp.h>
+#include <transport/udp.h>
+
 #include <verbosity.h>
 
 extern int verbosity_level;
@@ -43,5 +47,15 @@ void decode_ip6(const u_char * packet) {
 			ip_t->ip6_ctlun.ip6_un1.ip6_un1_plen, ip_t->ip6_ctlun.ip6_un1.ip6_un1_nxt);
 	VVV(1,"Version : %d - Traffic Class : %x - Flow Label : %x - Hop Limit : %d\n",
 			flow >> 28, (flow & 0x0ff00000) >> 20, flow & 0x000fffff,	ip_t->ip6_ctlun.ip6_un1.ip6_un1_hlim);
+
+	int offset = sizeof(struct ip6_hdr);
+	switch(ip_t->ip6_ctlun.ip6_un1.ip6_un1_nxt) {
+		case 0x06:
+			decode_tcp(packet + offset);
+			break;
+		case 0x11:
+			decode_udp(packet + offset);
+			break;
+	}
 }
 
