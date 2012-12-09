@@ -20,8 +20,9 @@
 
 #include <pcap.h>
 
-void start_scanner(char * interface);
-void start_file_scanner(char * file);
+// filter is NULL if there is no filter
+void start_scanner(char * interface, char * filter);
+void start_file_scanner(char * file, char * filter);
 void scan_packet(
     u_char * args, 
     const struct pcap_pkthdr * header, 

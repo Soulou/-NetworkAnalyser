@@ -33,11 +33,11 @@
 
 extern int verbosity_level;
 
-void start_file_scanner(char * file) {
+void start_file_scanner(char * file, char * filter) {
 	
 }
 
-void start_scanner(char * interface) {
+void start_scanner(char * interface, char * filter) {
   unsigned int net_ip, netmask;
   char * str_net_ip;
   char * str_netmask;
@@ -64,10 +64,21 @@ void start_scanner(char * interface) {
   VVV(0, "%s - %s (%s)\n", interface, str_net_ip , str_netmask);
 
   if((pcap_inst = pcap_open_live(interface, SNAPLEN, PROMISC_MODE, TIMEOUT_MS, errbuf)) == NULL) {
-    fprintf(stderr, "Failed to open %s in promiscuous mode\n", interface);
+    fprintf(stderr, "Failed to open %s\n", interface);
     exit(-1);
   }
 
+	if(filter) {
+		struct bpf_program fp;
+		if(pcap_compile(pcap_inst, &fp, filter, 0, netmask) == -1) {
+			fprintf(stderr, "Failed to compile filter : %s\n", filter);
+			exit(-1);
+		}
+		if(pcap_setfilter(pcap_inst, &fp) == -1) {
+			fprintf(stderr, "Failed to set filter : %s\n", filter);
+			exit(-1);
+		}
+	}
   pcap_loop(pcap_inst, NB_PACKETS_TO_CAPTURE, scan_packet, NULL);
 
   pcap_close(pcap_inst);
@@ -80,8 +91,6 @@ void scan_packet(
     const struct pcap_pkthdr * header, 
     const u_char * packet) {
 
-  VVV(0, "%d/%d bytes captured\n", header->caplen, header->len);
-  
   decode_ethernet(packet);
 }
 
