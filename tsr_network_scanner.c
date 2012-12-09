@@ -69,10 +69,10 @@ int main(int argc, char * argv[])
     usage(argv[0]);
   }
 
-	if(fvalue) {
-		start_file_scanner(fvalue);
+	if(ovalue) {
+		start_file_scanner(ovalue, fvalue);
 	} else {
-	  start_scanner(ivalue);
+	  start_scanner(ivalue, fvalue);
 	}
 
 	return 0;
