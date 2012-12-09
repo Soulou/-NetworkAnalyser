@@ -21,7 +21,8 @@ $(EXEC): $(ALL_OBJECTS)
 	$(CC) $(LDFLAGS) -o $(EXEC) $^
 
 clean:
-	rm *.o
+	find -iname "*.o" | xargs rm
+	
 
 dist-clean: clean 
-	Indentation and verbositym $(EXEC)
+	rm $(EXEC)
