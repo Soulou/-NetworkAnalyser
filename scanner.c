@@ -22,9 +22,9 @@
 #include <netinet/in.h>
 #include <pcap.h>
 
-#include "verbosity.h"
-#include "scanner.h"
-#include "ethernet.h"
+#include <verbosity.h>
+#include <scanner.h>
+#include <data_link/ethernet.h>
 
 #define PROMISC_MODE 0
 #define TIMEOUT_MS 500

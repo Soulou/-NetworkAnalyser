@@ -19,11 +19,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <arpa/inet.h>
 #include <net/ethernet.h>
 
-#include "ip.h"
-#include "ethernet.h"
-#include "verbosity.h"
+#include <network/ip.h>
+#include <network/ip6.h>
+#include <data_link/ethernet.h>
+#include <verbosity.h>
 
 extern int verbosity_level;
 
@@ -56,21 +58,30 @@ void decode_ethernet(const u_char * packet) {
 
   V(0, "Ethernet - %s --> %s - Type : ", str_shost, str_dhost);
 
-  switch(ethernet->ether_type) {
-    case 0x0008 :
-      V(0, "IP\n");
-      decode_ip(packet + sizeof(struct ether_header));
-      break;
-    case 0x0608 :
-      V(0, "ARP\n");
-      break;
-    case 0x3508 :
-      V(0, "RARP\n");
-      break;
-    default :
-      V(0, "Unknown\n");
-      break;
-  }
+	u_int16_t etype = htons(ethernet->ether_type);
+	if(etype < 0x05dc) {
+		V(0, "IEEE802.3\n");
+	}	else {
+		switch(etype) {
+			case 0x0800 :
+				V(0, "IPv4\n");
+				decode_ip(packet + sizeof(struct ether_header));
+				break;
+			case 0x86dd :
+				V(0, "IPv6\n");
+				decode_ip6(packet + sizeof(struct ether_header));
+				break;
+			case 0x0806 :
+				V(0, "ARP\n");
+				break;
+			case 0x0835 :
+				V(0, "RARP\n");
+				break;
+			default :
+				V(0, "Unknown (%x)\n", etype);
+				break;
+		}
+	}
 
   free(str_shost);
   free(str_dhost);

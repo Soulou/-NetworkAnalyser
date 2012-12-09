@@ -23,8 +23,12 @@
 #include <netinet/in.h>
 #include <netinet/ip.h>
 
-#include "ip.h"
-#include "verbosity.h"
+#include <network/ip.h>
+#include <network/icmp.h>
+#include <transport/tcp.h>
+#include <transport/udp.h>
+
+#include <verbosity.h>
 
 extern int verbosity_level;
 
@@ -33,9 +37,7 @@ void decode_ip(const u_char * packet) {
   char * str_dip;
 
   const struct ip *ip_t;
-	/* const struct iphdr * ip_hdr; */
   ip_t = (struct ip *)(packet);
-	/* ip_hdr = (struct iphdr *)(packet); */
 
   str_sip = inet_ntoa(ip_t->ip_src);
   str_sip = strndup(str_sip, strlen(str_sip));
@@ -43,16 +45,26 @@ void decode_ip(const u_char * packet) {
   str_dip = inet_ntoa(ip_t->ip_dst);
   str_dip = strndup(str_dip, strlen(str_dip));
 
-	if(ip_t->ip_v == 0x04) {
-		V(1, "IPv4 - %s --> %s\n", str_sip, str_dip);
-		if(verbosity_level >= 2) {
-			VV(1, "Header length : %d - Length : %d\n",
-					ip_t->ip_hl, ip_t->ip_len);
-			VVV(1,"ID : %d - Fragment Offset : %d - TTL : %d\n",
-					ip_t->ip_id, ip_t->ip_off, ip_t->ip_ttl);
-		}
-	} else {
-		V(1,"IPv6 ?????");
+	V(1, "IPv4 - %s --> %s\n", str_sip, str_dip);
+	VV(1, "Header length : %d - Length : %d\n",
+			ip_t->ip_hl, ip_t->ip_len);
+	VVV(1,"ID : %d - Fragment Offset : %d - TTL : %d\n",
+			ip_t->ip_id, ip_t->ip_off, ip_t->ip_ttl);
+
+	// If there are options, we need to set the pointer after
+	// them, so we don't use the sizeof(struct ip), but we
+	// calculate the real offset according to the IHL field
+	int offset = ip_t->ip_hl * 4;
+	switch(ip_t->ip_p) {
+		case 0x01:
+			decode_icmp(packet + offset);
+			break;
+		case 0x06:
+			decode_tcp(packet + offset);
+			break;
+		case 0x11:
+			decode_udp(packet + offset);
+			break;
 	}
 
 	free(str_dip);
