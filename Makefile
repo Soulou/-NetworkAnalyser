@@ -11,9 +11,10 @@ all: $(EXEC)
 DATA_LINK_OBJECTS=data_link/ethernet.o
 NETWORK_OBJSCTS=network/ip.o network/ip6.o network/icmp.o
 TRANSPORT_OBJECTS=transport/udp.o transport/tcp.o
-OBJECTS=$(EXEC).o verbosity.o scanner.o
+APPLICATION_OBJECTS=application/dhcp.o
+OBJECTS=$(EXEC).o verbosity.o scanner.o output.o
 
-ALL_OBJECTS=$(OBJECTS) $(TRANSPORT_OBJECTS) $(NETWORK_OBJSCTS) $(DATA_LINK_OBJECTS)
+ALL_OBJECTS=$(OBJECTS) $(APPLICATION_OBJECTS) $(TRANSPORT_OBJECTS) $(NETWORK_OBJSCTS) $(DATA_LINK_OBJECTS)
 
 
 $(EXEC): $(ALL_OBJECTS)
