@@ -23,12 +23,13 @@
 #include <netinet/tcp.h>
 
 #include <verbosity.h>
+#include <output.h>
 
 extern int verbosity_level;
 
 char * build_str_flags(const struct tcphdr * tcp_t) {
-	char buffer[30];
-	memset(buffer, '\0', 30);
+	char buffer[32];
+	memset(buffer, '\0', 32);
 
 	if(tcp_t->fin)
 		strcat(buffer, "|FIN");
