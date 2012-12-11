@@ -28,6 +28,6 @@ char * bold(char * s) {
 }
 char * white_on_red(char * s) {
 	char * ret = malloc(strlen(s) + 10);
-	sprintf(ret, "\e[4,1m%s\e[0m", s);
+	sprintf(ret, "\e[1;41m%s\e[0m", s);
 	return ret;
 }

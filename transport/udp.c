@@ -22,6 +22,7 @@
 #include <netinet/udp.h>
 
 #include <application/dhcp.h>
+#include <application/dns.h>
 
 #include <verbosity.h>
 
@@ -38,7 +39,9 @@ void decode_udp(const u_char * packet) {
 	VV(2, "Length : %d\n", udp_t->len);
 	VVV(2,"Checksum : %x\n", udp_t->check);
 
-	if(source == 0x43 || dest == 0x43) {
+	if(source == 0x35 || dest == 0x35) {
+		decode_dns(packet + sizeof(struct udphdr));
+	} else if(source == 0x43 || dest == 0x43) {
 		decode_dhcp(packet + sizeof(struct udphdr));
 	}
 }
