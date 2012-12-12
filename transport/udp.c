@@ -36,7 +36,7 @@ void decode_udp(const u_char * packet) {
 	u_int16_t dest = htons(udp_t->dest);
 
 	V(2, "UDP - Port %d --> %d\n", source, dest);
-	VV(2, "Length : %d\n", udp_t->len);
+	VV(2, "Length : %d\n", htons(udp_t->len));
 	VVV(2,"Checksum : %x\n", udp_t->check);
 
 	if(source == 0x35 || dest == 0x35) {
