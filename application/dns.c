@@ -112,7 +112,7 @@ void decode_dns(const u_char * packet) {
 
 	while(nb_ans > 0) {
 		dns_ans_t = (struct dns_ans *)(dns_data + offset);
-		V(3, "Answer (TTL %d) ", htonl(dns_ans_t->ttl));
+		V(3, "Answer (TTL %d) ", htons(dns_ans_t->ttl));
 		print_dns_field(htons(dns_ans_t->type));
 
 		offset += sizeof(struct dns_ans);
@@ -122,12 +122,15 @@ void decode_dns(const u_char * packet) {
 		if(htons(dns_ans_t->type) == DNS_A) {
 			ip.s_addr = *(u_int32_t*)(buffer);
 			V(0, "%s\n", inet_ntoa(ip));
+		} else if(htons(dns_ans_t->type) == DNS_MX) {
+			V(0, "%s\n", buffer);
 		} else if(htons(dns_ans_t->type) == DNS_AAAA) {
 			inet_ntop(AF_INET6, (u_int32_t*)(buffer), str_ip, INET6_ADDRSTRLEN);
 			V(0, "%s\n", str_ip);
 		} else {
 			V(0, "%s\n", buffer);
 		}
+		offset += htons(dns_ans_t->length);
 		nb_ans--;
 	}
 }

@@ -50,13 +50,16 @@ char * str_ips(const u_char * ptr, int n) {
 	int i;
 	// 16 : ip length, n*2 -> ", ", 3 -> [ ] \0
 	char * ret = malloc(n*16+n*2+3);
+	char * ip;
 	bzero(ret, n*16+n*2+3);
 	strcat(ret, "[");
 	for(i = 0; i < n; i++) {
-		strcat(ret, str_ip(ptr+i*4));
+		ip = str_ip(ptr+i*4);
+		strcat(ret, ip);
 		if(i != n-1) {
 			strcat(ret, ", ");
 		}
+		free(ip);
 	}
 	strcat(ret, "]");
 	return ret;
@@ -86,6 +89,7 @@ void decode_dhcp(const u_char * packet) {
 		int n = 4, nb_ip, i;
 		char * tmp_str;
 		u_int16_t size;
+		u_int32_t time;
 
 		while(dhcp_data[n] != DHCP_END_OPT) {
 			switch(dhcp_data[n]) {
@@ -122,18 +126,34 @@ void decode_dhcp(const u_char * packet) {
 					VV(3, "Broadcast : %s\n",	tmp_str);
 					free(tmp_str);
 					break;
+				case DHCP_DOMAINNAME:
+					tmp_str = malloc(dhcp_data[n+1]);
+					memcpy(tmp_str, dhcp_data +n+2, dhcp_data[n+1]);
+					VV(3, "Domain name : %s\n", tmp_str);
+					free(tmp_str);
+					break;
 				case DHCP_MAXMSGSIZE:
 					memcpy(&size, dhcp_data+n+2, 2);
 					VVV(3, "Max message size : %d\n", htons(size)); 
 					break;
 				case DHCP_VENDORID:
-					tmp_str = malloc(dhcp_data[n+1]);
+					tmp_str = malloc(dhcp_data[n+1]+1);
 					memcpy(tmp_str, dhcp_data +n+2, dhcp_data[n+1]);
+					tmp_str[dhcp_data[n+1]] = '\0';
 					VVV(3, "Vendor ID : %s\n", tmp_str);
 					free(tmp_str);
 					break;
+				case DHCP_RENEWTIME:
+					memcpy(&time, dhcp_data+n+2, 2);
+					VVV(3, "Bind renew time : %d\n", htons(time)); 
+					break;
+				case DHCP_REBINDTIME:
+					memcpy(&time, dhcp_data+n+2, 2);
+					VVV(3, "Bind rebind time : %d\n", htons(time)); 
+					break;
 				case DHCP_HOSTNAME:
-					tmp_str = malloc(dhcp_data[n+1]);
+					tmp_str = malloc(dhcp_data[n+1]+1);
+					tmp_str[dhcp_data[n+1]] = '\0';
 					memcpy(tmp_str, dhcp_data +n+2, dhcp_data[n+1]);
 					VV(3, "Hostname : %s\n", tmp_str);
 					free(tmp_str);

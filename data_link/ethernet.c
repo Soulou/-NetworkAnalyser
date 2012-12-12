@@ -21,6 +21,7 @@
 
 #include <arpa/inet.h>
 #include <net/ethernet.h>
+#include <netinet/ether.h>
 
 #include <network/ip.h>
 #include <network/ip6.h>
@@ -31,23 +32,6 @@
 
 extern int verbosity_level;
 
-char * str_ethernet_addr(const u_int8_t * addr) {
-  int i = 0;
-  char * saddr = (char*)malloc(30);
-  char hexbuffer[3]; 
-
-  for(i = 0; i < 32; i++) {
-    saddr[i] = '\0';
-  }
-  for(i = 0 ; i < ETH_ALEN; i++) {
-    sprintf(hexbuffer, "%02X", addr[i]);
-    strncat(saddr, hexbuffer, 2);
-    if(i != ETH_ALEN-1)
-      strncat(saddr, ":", 1);
-  }
-  return saddr;
-}
-
 void decode_ethernet(const u_char * packet) {
   char * str_shost = NULL;
   char * str_dhost = NULL;
@@ -57,9 +41,12 @@ void decode_ethernet(const u_char * packet) {
   const struct ether_header *ethernet;
   ethernet = (struct ether_header*)(packet);
   
-  str_shost = str_ethernet_addr(ethernet->ether_shost);
-  str_dhost = str_ethernet_addr(ethernet->ether_dhost);
+	const struct ether_addr mac;
+	memcpy(&(mac.ether_addr_octet), ethernet->ether_shost, ETH_ALEN);
+	str_shost = ether_ntoa(&mac);
 	b_str_shost = bold(str_shost);
+	memcpy(&(mac.ether_addr_octet), ethernet->ether_dhost, ETH_ALEN);
+	str_dhost = ether_ntoa(&mac);
 	b_str_dhost = bold(str_dhost);
 
   V(0, "Ethernet - %s --> %s - Type : ", b_str_shost, b_str_dhost);
@@ -89,7 +76,7 @@ void decode_ethernet(const u_char * packet) {
 		}
 	}
 
-  free(str_shost);
-  free(str_dhost);
+  free(b_str_shost);
+  free(b_str_dhost);
 }
 
