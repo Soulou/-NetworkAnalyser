@@ -49,9 +49,9 @@ void decode_ip(const u_char * packet) {
 
 	V(1, "IPv4 - %s --> %s\n", b_str_sip, b_str_dip);
 	VV(1, "Header length : %d - Length : %d\n",
-			ip_t->ip_hl, ip_t->ip_len);
+			ip_t->ip_hl, htons(ip_t->ip_len));
 	VVV(1,"ID : %d - Fragment Offset : %d - TTL : %d\n",
-			ip_t->ip_id, ip_t->ip_off, ip_t->ip_ttl);
+			htons(ip_t->ip_id), ip_t->ip_off, ip_t->ip_ttl);
 
 	// If there are options, we need to set the pointer after
 	// them, so we don't use the sizeof(struct ip), but we

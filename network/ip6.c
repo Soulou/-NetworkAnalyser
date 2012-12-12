@@ -44,7 +44,7 @@ void decode_ip6(const u_char * packet) {
 	V(1, "IPv6 - %s --> %s\n", str_sip, str_dip);
 	uint32_t flow = htonl(ip_t->ip6_ctlun.ip6_un1.ip6_un1_flow);
 	VV(1, "Payload Length : %d - Next Header : %x\n",
-			ip_t->ip6_ctlun.ip6_un1.ip6_un1_plen, ip_t->ip6_ctlun.ip6_un1.ip6_un1_nxt);
+			htons(ip_t->ip6_ctlun.ip6_un1.ip6_un1_plen), ip_t->ip6_ctlun.ip6_un1.ip6_un1_nxt);
 	VVV(1,"Version : %d - Traffic Class : %x - Flow Label : %x - Hop Limit : %d\n",
 			flow >> 28, (flow & 0x0ff00000) >> 20, flow & 0x000fffff,	ip_t->ip6_ctlun.ip6_un1.ip6_un1_hlim);
 

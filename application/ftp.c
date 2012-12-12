@@ -39,12 +39,15 @@ void decode_ftp_data(const u_char * packet) {
 		i++;
 	}
 	buffer[i] = '\0';
-	grey_str = grey(buffer)
-	VV(3, "FTP-DATA : \n");
-	if(verbosity_level < 3)
-		VV(3, "Verbosity level at 3 shows the content.\n");
-	VVV(0, "%s\n", grey_str);
-	free(grey_str);
+	if(strcmp(buffer, "")) {
+		grey_str = grey(buffer)
+		VV(3, "FTP-DATA : \n");
+		if(verbosity_level < 3) {
+			VV(3, "Verbosity level at 3 shows the content.\n");
+		}
+		VVV(0, "%s\n", grey_str);
+		free(grey_str);
+	}
 }
 
 void decode_ftp(const u_char * packet) {
@@ -56,10 +59,12 @@ void decode_ftp(const u_char * packet) {
 		i++;
 	}
 	buffer[i] = '\0';
-	yellow_str = yellow(buffer)
-	V(3, "FTP : ");
-	V(0, "%s\n", yellow_str);
-	free(yellow_str);
+	if(strcmp(buffer, "")) {
+		yellow_str = yellow(buffer)
+		V(3, "FTP : ");
+		V(0, "%s\n", yellow_str);
+		free(yellow_str);
+	}
 }
 
 
