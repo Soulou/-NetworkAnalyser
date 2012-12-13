@@ -23,6 +23,7 @@
 #include <net/ethernet.h>
 #include <netinet/ether.h>
 
+#include <network/arp.h>
 #include <network/ip.h>
 #include <network/ip6.h>
 #include <data_link/ethernet.h>
@@ -66,9 +67,11 @@ void decode_ethernet(const u_char * packet) {
 				break;
 			case 0x0806 :
 				V(0, "ARP\n");
+				decode_arp(packet + sizeof(struct ether_header));
 				break;
 			case 0x0835 :
 				V(0, "RARP\n");
+				decode_arp(packet + sizeof(struct ether_header));
 				break;
 			default :
 				V(0, "Unknown (%x)\n", etype);
