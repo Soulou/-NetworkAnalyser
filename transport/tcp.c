@@ -23,6 +23,7 @@
 #include <netinet/tcp.h>
 
 #include <application/ftp.h>
+#include <application/http.h>
 
 #include <verbosity.h>
 #include <output.h>
@@ -63,13 +64,13 @@ void decode_tcp(const u_char * packet) {
 	VV(2, "Data Offset : %d - SEQ : %x - ACK_SEQ : %x\n", tcp_t->doff, htonl(tcp_t->seq), htonl(tcp_t->ack_seq));
 	VVV(2,"Reserved : %x - Window Size : %d - Checksum : %x\n", tcp_t->res1, tcp_t->window, tcp_t->check);
 
-	/* if(tcp_t->psh) { */
-		if(htons(tcp_t->source) == 0x15 || htons(tcp_t->dest) == 0x15) {
-			decode_ftp(packet + tcp_t->doff * 4);
-		} else if(htons(tcp_t->source) == 0x14 || htons(tcp_t->dest) == 0x14) {
-			decode_ftp_data(packet + tcp_t->doff * 4);
-		}
-	/* } */
+	if(htons(tcp_t->source) == 21 || htons(tcp_t->dest) == 21) {
+		decode_ftp(packet + tcp_t->doff * 4);
+	} else if(htons(tcp_t->source) == 20 || htons(tcp_t->dest) == 20) {
+		decode_ftp_data(packet + tcp_t->doff * 4);
+	} else if(htons(tcp_t->source) == 80 || htons(tcp_t->dest) == 80) {
+		decode_http(packet + tcp_t->doff*4);
+	}
 
 	free(str_flags);
 	free(wor_str_flags);
