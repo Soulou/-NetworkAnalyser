@@ -35,6 +35,8 @@ extern int verbosity_level;
 
 void decode_ip(const u_char * packet) {
   char * str_sip, * str_dip, * b_str_dip, * b_str_sip;
+  char * yellow_hlen, *yellow_len;
+  char buffer[128];
 
   const struct ip *ip_t;
   ip_t = (struct ip *)(packet);
@@ -47,9 +49,14 @@ void decode_ip(const u_char * packet) {
 	b_str_dip = bold(str_dip);
 	b_str_sip = bold(str_sip);
 
+  sprintf(buffer, "%d", ip_t->ip_hl);
+  yellow_hlen = yellow(buffer);
+  sprintf(buffer, "%d", htons(ip_t->ip_len));
+  yellow_len = yellow(buffer);
+
 	V(1, "IPv4 - %s --> %s\n", b_str_sip, b_str_dip);
-	VV(1, "Header length : %d - Length : %d\n",
-			ip_t->ip_hl, htons(ip_t->ip_len));
+	VV(1, "Header length : %s - Length : %s\n",
+			yellow_hlen, yellow_len);
 	VVV(1,"ID : %d - Fragment Offset : %d - TTL : %d\n",
 			htons(ip_t->ip_id), ip_t->ip_off, ip_t->ip_ttl);
 
@@ -73,5 +80,7 @@ void decode_ip(const u_char * packet) {
 	free(str_sip);
 	free(b_str_dip);
 	free(b_str_sip);
+  free(yellow_hlen);
+  free(yellow_len);
 }
 

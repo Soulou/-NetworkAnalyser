@@ -72,7 +72,7 @@ int main(int argc, char * argv[])
 	if(ovalue) {
 		start_file_scanner(ovalue, fvalue);
 	} else {
-	  start_scanner(ivalue, fvalue);
+	  start_live_scanner(ivalue, fvalue);
 	}
 
 	return 0;

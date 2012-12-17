@@ -33,19 +33,33 @@
 
 extern int verbosity_level;
 
+/**
+ * @param file pcap file containg packets to analyse
+ * @param filter BPF filter to apply
+ */
 void start_file_scanner(char * file, char * filter) {
-	
+  char errbuf[PCAP_ERRBUF_SIZE];
+  pcap_t * pcap_inst;
+  
+  if((pcap_inst = pcap_open_offline(file, errbuf)) == NULL) {
+    fprintf(stderr, "Failed to open file %s : %s\n", file, errbuf);
+    exit(-1);
+  }
+
+  start_scanner(pcap_inst, filter);
 }
 
-void start_scanner(char * interface, char * filter) {
+/**
+ * @param file Interface to open
+ * @param filter BPF filter to apply 
+ */
+void start_live_scanner(char * interface, char * filter) {
   unsigned int net_ip, netmask;
   char * str_net_ip;
   char * str_netmask;
   struct in_addr addr;
-  pcap_t * pcap_inst;
   char errbuf[PCAP_ERRBUF_SIZE];
-
-  /* pcap_t * */ 
+  pcap_t * pcap_inst;
 
   if((pcap_lookupnet (interface, &net_ip, &netmask, errbuf)) == -1) {
     fprintf(stderr, "Failed to get information about %s : %s\n", interface, errbuf);
@@ -54,7 +68,6 @@ void start_scanner(char * interface, char * filter) {
 
   addr.s_addr = net_ip;
   str_net_ip = inet_ntoa(addr);
-  // As inet_ntoa will erase the pointer when recalled
   str_net_ip = strndup(str_net_ip, strlen(str_net_ip));
 
   addr.s_addr = netmask;
@@ -68,9 +81,15 @@ void start_scanner(char * interface, char * filter) {
     exit(-1);
   }
 
+  free(str_net_ip);
+  free(str_netmask);
+  start_scanner(pcap_inst, filter);
+}
+
+void start_scanner(pcap_t * pcap_inst, char * filter) {
 	if(filter) {
 		struct bpf_program fp;
-		if(pcap_compile(pcap_inst, &fp, filter, 0, netmask) == -1) {
+		if(pcap_compile(pcap_inst, &fp, filter, 0, 0) == -1) {
 			fprintf(stderr, "Failed to compile filter : %s\n", filter);
 			exit(-1);
 		}
@@ -80,10 +99,7 @@ void start_scanner(char * interface, char * filter) {
 		}
 	}
   pcap_loop(pcap_inst, NB_PACKETS_TO_CAPTURE, scan_packet, NULL);
-
   pcap_close(pcap_inst);
-  free(str_net_ip);
-  free(str_netmask);
 }
 
 void scan_packet(
@@ -92,6 +108,7 @@ void scan_packet(
     const u_char * packet) {
 
   decode_ethernet(packet);
+  printf("\n");
 }
 
 

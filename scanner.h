@@ -21,7 +21,8 @@
 #include <pcap.h>
 
 // filter is NULL if there is no filter
-void start_scanner(char * interface, char * filter);
+void start_scanner(pcap_t * pcap_inst, char * filter);
+void start_live_scanner(char * interface, char * filter);
 void start_file_scanner(char * file, char * filter);
 void scan_packet(
     u_char * args, 

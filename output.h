@@ -21,6 +21,7 @@
 char * bold(char * s);
 char * white_on_red(char * s);
 char * yellow(char * s);
+char * red(char * s);
 char * grey(char * s);
 
 #endif

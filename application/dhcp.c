@@ -121,6 +121,11 @@ void decode_dhcp(const u_char * packet) {
 					VV(3, "DNS : %s\n", tmp_str);
 					free(tmp_str);
 					break;
+        case DHCP_IP:
+          tmp_str = str_ip(dhcp_data+n+2);
+          VV(3, "Requested IP : %s\n", tmp_str);
+          free(tmp_str);
+          break;
 				case DHCP_BROADCAST:
 					tmp_str = str_ip(dhcp_data+n+2);
 					VV(3, "Broadcast : %s\n",	tmp_str);

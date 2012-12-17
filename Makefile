@@ -11,7 +11,10 @@ all: $(EXEC)
 DATA_LINK_OBJECTS=data_link/ethernet.o
 NETWORK_OBJSCTS=network/ip.o network/ip6.o network/icmp.o network/arp.o
 TRANSPORT_OBJECTS=transport/udp.o transport/tcp.o
-APPLICATION_OBJECTS=application/dhcp.o application/dns.o application/ftp.o application/http.o
+APPLICATION_OBJECTS=application/dhcp.o application/dns.o \
+										application/ftp.o application/http.o \
+										application/smtp.o application/pop.o \
+										application/imap.o
 OBJECTS=$(EXEC).o verbosity.o scanner.o output.o
 
 ALL_OBJECTS=$(OBJECTS) $(APPLICATION_OBJECTS) $(TRANSPORT_OBJECTS) $(NETWORK_OBJSCTS) $(DATA_LINK_OBJECTS)
@@ -22,7 +25,6 @@ $(EXEC): $(ALL_OBJECTS)
 
 clean:
 	find -iname "*.o" | xargs rm
-	
 
 dist-clean: clean 
 	rm $(EXEC)

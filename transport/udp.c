@@ -24,6 +24,7 @@
 #include <application/dhcp.h>
 #include <application/dns.h>
 
+#include <output.h>
 #include <verbosity.h>
 
 extern int verbosity_level;
@@ -35,7 +36,13 @@ void decode_udp(const u_char * packet) {
 	u_int16_t source = htons(udp_t->source);
 	u_int16_t dest = htons(udp_t->dest);
 
-	V(2, "UDP - Port %d --> %d\n", source, dest);
+  char str_sport[6], str_dport[6], *red_sport, *red_dport;
+  sprintf(str_sport, "%d", source);
+  sprintf(str_dport, "%d", dest);
+  red_sport = red(str_sport);
+  red_dport = red(str_dport);
+
+	V(2, "UDP - Port %s --> %s\n", red_dport, red_sport);
 	VV(2, "Length : %d\n", htons(udp_t->len));
 	VVV(2,"Checksum : %x\n", udp_t->check);
 
@@ -44,4 +51,7 @@ void decode_udp(const u_char * packet) {
 	} else if(source == 0x43 || dest == 0x43) {
 		decode_dhcp(packet + sizeof(struct udphdr));
 	}
+
+  free(red_sport);
+  free(red_dport);
 }

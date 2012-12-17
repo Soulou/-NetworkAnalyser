@@ -17,13 +17,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
+#include <ctype.h> 
 
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-#include <application/ftp.h>
+#include <application/http.h>
 
 #include <output.h>
 #include <verbosity.h>
@@ -38,13 +38,30 @@ void decode_http(const u_char * packet) {
 		buffer[i] = packet[i];
 		i++;
 	}
-	buffer[i] = '\0';
-	if(strcmp(buffer, "")) {
-		yellow_str = yellow(buffer)
-		V(3, "HTTP : ");
-		V(0, "%s\n", yellow_str);
-		free(yellow_str);
-	}
+  buffer[i] = '\0';
+
+  V(3, "HTTP - ");
+  if(!strlen(buffer)) {
+    V(0, "No DATA\n");
+  }
+  else if(!strcspn(buffer, "PUT") || !strcspn(buffer, "POST") || !strcspn(buffer, "GET") ||
+        !strcspn(buffer, "PATCH") || !strcspn(buffer, "DELETE")) {
+    yellow_str = yellow(buffer)
+    V(0, "%s\n", yellow_str);
+    free(yellow_str);
+  }
+  else {
+    V(0, "DATA\n")
+    VVV(4, "\e[37m");
+    for(i = 0; i < strlen(buffer); i++) {
+      if(!isprint(buffer[i])) {
+        VVV(0, "%x", buffer[i]);
+      } else {
+        VVV(0, "%c", buffer[i]);
+      }
+    }
+    VVV(0, "\e[0m\n");
+  }
 }
 
 

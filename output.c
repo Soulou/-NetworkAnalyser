@@ -31,6 +31,11 @@ char * white_on_red(char * s) {
 	sprintf(ret, "\e[1;41m%s\e[0m", s);
 	return ret;
 }
+char * red(char * s) {
+	char * ret = malloc(strlen(s) + 16);
+	sprintf(ret, "\e[1;31m%s\e[0m", s);
+	return ret;
+}
 char * yellow(char * s) {
 	char * ret = malloc(strlen(s) + 16);
 	sprintf(ret, "\e[1;33m%s\e[0m", s);
@@ -41,3 +46,4 @@ char * grey(char * s) {
 	sprintf(ret, "\e[37m%s\e[0m", s);
 	return ret;
 }
+

@@ -25,6 +25,7 @@
 
 #include <application/dns.h>
 
+#include <output.h>
 #include <verbosity.h>
 
 extern int verbosity_level;
@@ -70,7 +71,6 @@ void print_dns_class(u_int16_t class) {
 }
 
 void decode_dns(const u_char * packet) {
-	
 	const struct dns_hdr * dns_t;
 	const struct dns_ans * dns_ans_t;
 	dns_t = (struct dns_hdr *)(packet);

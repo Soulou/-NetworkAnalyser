@@ -27,6 +27,7 @@
 #include <transport/tcp.h>
 #include <transport/udp.h>
 
+#include <output.h>
 #include <verbosity.h>
 
 extern int verbosity_level;
@@ -34,17 +35,27 @@ extern int verbosity_level;
 void decode_ip6(const u_char * packet) {
   char str_sip[INET6_ADDRSTRLEN];
   char str_dip[INET6_ADDRSTRLEN];
+  char buffer[128];
 
+  char * yellow_plen, *yellow_nxt, *b_sip, *b_dip;
 	const struct ip6_hdr * ip_t;
 	ip_t = (struct ip6_hdr *)(packet);
 
   inet_ntop(AF_INET6, &(ip_t->ip6_src), str_sip, INET6_ADDRSTRLEN);
   inet_ntop(AF_INET6, &(ip_t->ip6_dst), str_dip, INET6_ADDRSTRLEN);
 
-	V(1, "IPv6 - %s --> %s\n", str_sip, str_dip);
+  b_sip = bold(str_sip);
+  b_dip = bold(str_dip);
+
+  sprintf(buffer, "%d", htons(ip_t->ip6_ctlun.ip6_un1.ip6_un1_plen));
+  yellow_plen = yellow(buffer);
+  sprintf(buffer, "%x", ip_t->ip6_ctlun.ip6_un1.ip6_un1_plen);
+  yellow_nxt = yellow(buffer);
+
+	V(1, "IPv6 - %s --> %s\n", b_sip, b_dip);
 	uint32_t flow = htonl(ip_t->ip6_ctlun.ip6_un1.ip6_un1_flow);
-	VV(1, "Payload Length : %d - Next Header : %x\n",
-			htons(ip_t->ip6_ctlun.ip6_un1.ip6_un1_plen), ip_t->ip6_ctlun.ip6_un1.ip6_un1_nxt);
+	VV(1, "Payload Length : %s - Next Header : %s\n", yellow_plen, yellow_nxt);
+			/* htons(ip_t->ip6_ctlun.ip6_un1.ip6_un1_plen), ip_t->ip6_ctlun.ip6_un1.ip6_un1_nxt); */
 	VVV(1,"Version : %d - Traffic Class : %x - Flow Label : %x - Hop Limit : %d\n",
 			flow >> 28, (flow & 0x0ff00000) >> 20, flow & 0x000fffff,	ip_t->ip6_ctlun.ip6_un1.ip6_un1_hlim);
 
@@ -57,5 +68,10 @@ void decode_ip6(const u_char * packet) {
 			decode_udp(packet + offset);
 			break;
 	}
+
+  free(yellow_plen);
+  free(yellow_nxt);
+  free(b_sip);
+  free(b_dip);
 }
 
