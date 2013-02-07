@@ -23,7 +23,7 @@ extern int verbosity_level;
 
 void _V(int _tabs, char * format, ...) {
   va_list argp;
-	va_start(argp, 0);
+	va_start(argp, format);
   int __i;
   for(__i = 0; __i < _tabs; __i++) 
     printf("  "); 
